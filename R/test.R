@@ -1,19 +1,17 @@
-
-ncheck <- c(
-  "pid"  ,                                                
-  "ui:2" ,                                                
-  "proc:2",                                              
-  "med:2",                                                
-  "ui_any:2" ,                                            
-  "age_bin_5:14" ,                                        
-  "charlson_comorb:5 (1-5, 1 being mild 5 being extreme)",
-  "zip3:20 (not accurately distributed)",                 
-  "date_dx_proc_med:91" ,                                 
-  "referal:3" ,                                           
-  "PRO_1:4"   
+shinyApp(
+  ui = basicPage(actionButton("go", "Go")),
+  server = function(input, output, session) {
+    observeEvent(input$go, {
+      insertUI("#go", "afterEnd",
+               actionButton("dynamic", "click to remove"))
+      
+      # set up an observer that depends on the dynamic
+      # input, so that it doesn't run when the input is
+      # created, and only runs once after that (since
+      # the side effect is remove the input from the DOM)
+      observeEvent(input$dynamic, {
+        removeUI("#dynamic")
+      }, ignoreInit = TRUE, once = TRUE)
+    })
+  }
 )
-up <-  readxl::read_excel("patients.xlsx") %>% select(1:11)
-names <- up %>% names() 
-checked <- (names == ncheck) 
-df <- tibble(names,checked)
-all(df$checked)

@@ -21,7 +21,10 @@ loadUI <- function(id) {
          ## confirmation box
          textOutput(NS(id,"up_conf")),
          ## save to full dataset
-         uiOutput(NS(id,"up_save"))
+         # actionButton(NS(id,"up_save"), 'save')
+         # #uiOutput(NS(id,"up_save"))
+         
+         textOutput(NS(id,"test"))
   )
 }
 
@@ -30,14 +33,14 @@ loadServer <- function(id) {
     id,
     function(input, output, session) {
       ups <- tibble()
+      flag <- reactiveVal(F)
       
       ## takes upload data input and reads the dataset
       up <- reactive({
         req(input$upload)
         ext <- tools::file_ext(input$upload$name)
         xlsx <-  readxl::read_excel(input$upload$datapath)%>% select(1:11) 
-        ups <- xlsx
-        xlsx
+        return(xlsx)
       }
       )
       
@@ -56,10 +59,13 @@ loadServer <- function(id) {
           "referal:3" ,                                           
           "PRO_1:4"   
         )
-        names <- up() %>% names() 
+        names <- up() %>% names()  
         checked <- (names == ncheck) 
+        if(all(checked)){
+          flag(T)
+        } 
         df <- tibble(names,checked)
-        df
+        return(df)
       })
       
       
@@ -71,7 +77,8 @@ loadServer <- function(id) {
       ## print confirmation text
       output$up_conf <- renderText({
         df <- up_name_check()
-        if(all(df$checked)){
+        #if(all(df$checked)){
+          if(flag()){
           "Variables Match"
           # call function save
         } else 
@@ -84,18 +91,33 @@ loadServer <- function(id) {
         head(up(), input$upload_n)
       })
       
-      # render the save button if all up_name_che()$checked are true
-      output$up_save <-
-        renderUI(expr = if (all(up_name_check()$checked)) {
-          submitButton()
-        } else {
-          NULL
+      observeEvent(flag(),{
+        if(flag() == TRUE) {
+          insertUI("#load-up_conf", "afterEnd",
+                   actionButton(NS(id,"up_save"), "Action"))
+        }
         })
       
-      observeEvent(input$up_save,  reactive({
+      observeEvent(input$up_save, {
+                   print("Yes")
+                   df <- rbind(df,up)
+                   saveRDS(up, file="df.rds")}
+                   )
+      # render the save button if all up_name_check()$checked are true
+      # output$up_save <-
+      #   renderUI(expr = if (all(up_name_check()$checked)) {
+      #     submitButton("submit")
+      #   } else {
+      #     NULL
+      #   })
+      
+      
+      
+      eventReactive(input$submit, {
         df <- rbind(df,up)
-        saveRDS(ups, file="df.rds")
-      }))
+        saveRDS(up, file="df.rds")
+        }
+      )
     }
   )
 }
