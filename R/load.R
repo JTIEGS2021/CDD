@@ -1,43 +1,27 @@
-## password database
-user_base <- tibble(
-  user = c("user1", "user2"),
-  password = c("pass1", "pass2"),
-  permissions = c("admin", "standard"),
-  name = c("User One", "User Two")
-)
-
-
-
-
+## Functions ************************
+# add the load UI 
 loadUI <- function(id) {
-  # Static Component
-  # - load table field
-  # - number of rows to display field
-  # - table display 
-  # - review of upload varriable matching
-  # - verbale confirmation field
-  
-  # Dynamic
-  # - submit button
-  # - confirmation of submission
-  
-  loadui <- list(
-    fileInput(NS(id, "upload"), NULL, accept = c(".xlsx")),
-    numericInput(NS(id, "upload_n"), "Check Rows", value = 5, min = 1, step = 1),
-    tableOutput(NS(id, "head")),
-    verbatimTextOutput(NS(id, "upload_name_check")),
-    textOutput(NS(id, "upload_conf"))
+  insertUI(
+    "#load-status",
+    "afterEnd",
+    tagList(
+      fileInput(NS(id, "upload"), NULL, accept = c(".xlsx")),
+      numericInput(
+        NS(id, "upload_n"),
+        "Check Rows",
+        value = 5,
+        min = 1,
+        step = 1
+      ),
+      tableOutput(NS(id, "head")),
+      verbatimTextOutput(NS(id, "upload_name_check")),
+      textOutput(NS(id, "upload_conf"))
+    )
   )
-  
-  # tabPanel("load",
-  #          fileInput(NS(id, "upload"), NULL, accept = c(".xlsx")),
-  #          numericInput(NS(id, "upload_n"), "Check Rows", value = 5, min = 1, step = 1),
-  #          tableOutput(NS(id, "head")),
-  #          verbatimTextOutput(NS(id, "upload_name_check")),
-  #          textOutput(NS(id, "upload_conf"))
-  # )
 }
 
+
+## Modules *****************************8
 loadServer <- function(id) {
   moduleServer(id,
                function(input, output, session) {
