@@ -8,6 +8,11 @@ library(shinyauthr)
 files <- c("welcome.R","load.R","utils.R", "dataset.R", "reports.R")
 map(files, source)
 
+##utils or random parts
+df <- readRDS("df.rds")
+#df <- readRDS("R/df.rds")
+#nrow(df)
+upload_df <- tibble()
 
 
 
@@ -26,6 +31,7 @@ server <- function(input, output, session) {
 
 reactlog::reactlog_enable()
 shinyApp(ui, server)
+
 
 
 
