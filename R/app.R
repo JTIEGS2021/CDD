@@ -5,11 +5,11 @@ library(shiny)
 library(shinyauthr)
 
 
-files <- c("welcome.R","load.R","utils.R", "dataset.R", "reports.R")
+files <- c("welcome.R","load.R","utils.R", "dataset.R", "reports.R","global.R")
 map(files, source)
 
 ##utils or random parts
-df <- readRDS("df.rds")
+dfs <- readRDS("df.rds")
 #df <- readRDS("R/df.rds")
 #nrow(df)
 upload_df <- tibble()
