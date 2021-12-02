@@ -21,13 +21,21 @@ loadUI <- function(id) {
   # - submit button
   # - confirmation of submission
   
-  tabPanel("load",
+  loadui <- list(
     fileInput(NS(id, "upload"), NULL, accept = c(".xlsx")),
     numericInput(NS(id, "upload_n"), "Check Rows", value = 5, min = 1, step = 1),
     tableOutput(NS(id, "head")),
     verbatimTextOutput(NS(id, "upload_name_check")),
     textOutput(NS(id, "upload_conf"))
   )
+  
+  # tabPanel("load",
+  #          fileInput(NS(id, "upload"), NULL, accept = c(".xlsx")),
+  #          numericInput(NS(id, "upload_n"), "Check Rows", value = 5, min = 1, step = 1),
+  #          tableOutput(NS(id, "head")),
+  #          verbatimTextOutput(NS(id, "upload_name_check")),
+  #          textOutput(NS(id, "upload_conf"))
+  # )
 }
 
 loadServer <- function(id) {
@@ -106,9 +114,9 @@ loadServer <- function(id) {
                  
                  ## Reacts to selecting submit, adds upload to df, then removes submit 
                  observeEvent(input$upload_save, {
-                   print("Yes")
                    df <- rbind(dfs, upload_df)
                    saveRDS(df, file = "df.rds")
+                   print("Data saved to main DF")
                    removeUI("#load-upload_save")
                  })
                })

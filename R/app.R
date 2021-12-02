@@ -5,32 +5,30 @@ library(shiny)
 library(shinyauthr)
 
 
-files <- c("welcome.R","load.R","utils.R", "dataset.R", "reports.R","global.R")
+files <- c("welcome.R","load.R","utils.R", "dataset.R", "reports.R","global.R",
+           "load_pass.R")
 map(files, source)
-
-##utils or random parts
-dfs <- readRDS("df.rds")
-#df <- readRDS("R/df.rds")
-#nrow(df)
-upload_df <- tibble()
-
 
 
 ui <- fluidPage(
-  tabsetPanel(
+  tabsetPanel(id="tabs",
   ## Welcome post
   welcomeUI("welcome"),
   datasetUI("dataset"),
   reportsUI("report"),
-  loadUI("load")
+  passUI("load"),
+  #loadUI("load")
   ))
 
 server <- function(input, output, session) {
+  
+  passServer("load")
   loadServer("load")
 }
 
 reactlog::reactlog_enable()
 shinyApp(ui, server)
+
 
 
 
