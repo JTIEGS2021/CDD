@@ -1,7 +1,6 @@
 # Tab Page
 datasetUI <- function(id) {
-  ns <- NS(id)
-  tabPanel(ns("Dataset"),
+  tabPanel("Dataset",
            h2("Dataset Summary"))
 }
 

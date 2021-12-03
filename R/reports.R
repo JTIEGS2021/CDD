@@ -1,7 +1,6 @@
 # Tab Page
 reportsUI <- function(id) {
-  ns <- NS(id)
-  tabPanel(ns("Reports"),
+  tabPanel("Reports", 
            h2("Reports Summary"))
 }
 

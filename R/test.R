@@ -1,19 +1,28 @@
-
-ncheck <- c(
-  "pid"  ,                                                
-  "ui:2" ,                                                
-  "proc:2",                                              
-  "med:2",                                                
-  "ui_any:2" ,                                            
-  "age_bin_5:14" ,                                        
-  "charlson_comorb:5 (1-5, 1 being mild 5 being extreme)",
-  "zip3:20 (not accurately distributed)",                 
-  "date_dx_proc_med:91" ,                                 
-  "referal:3" ,                                           
-  "PRO_1:4"   
+ui <- fluidPage(
+  sidebarLayout(
+    sidebarPanel(
+      actionButton("add", "Add 'Dynamic' tab"),
+      actionButton("remove", "Remove 'Foo' tab")
+    ),
+    mainPanel(
+      tabsetPanel(id = "tabs",
+                  tabPanel("Hello", "This is the hello tab"),
+                  tabPanel("Foo", "This is the foo tab"),
+                  tabPanel("Bar", "This is the bar tab")
+      )
+    )
+  )
 )
-up <-  readxl::read_excel("patients.xlsx") %>% select(1:11)
-names <- up %>% names() 
-checked <- (names == ncheck) 
-df <- tibble(names,checked)
-all(df$checked)
+server <- function(input, output, session) {
+  observeEvent(input$add, {
+    insertTab(inputId = "tabs",
+              tabPanel("Dynamic", "This a dynamically-added tab"),
+              target = "Bar"
+    )
+  })
+  observeEvent(input$remove, {
+    removeTab(inputId = "tabs", target = "Foo")
+  })
+}
+
+shinyApp(ui, server)
