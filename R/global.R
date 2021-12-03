@@ -1,4 +1,9 @@
-df_base <- readRDS("df_base.rds")
+read_df_base <- function() {
+  df_base <- readRDS("df_base.rds")
+  return(df_base)
+}
+df_base <- read_df_base()
+
 df <- tibble(                     `pid` = "" ,
                                   `ui:2` = "" ,
                                   `proc:2` = "",

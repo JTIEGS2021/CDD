@@ -24,6 +24,7 @@ server <- function(input, output, session) {
   
   passServer("load")
   loadServer("load")
+  datasetServer("dataset")
 }
 
 reactlog::reactlog_enable()
