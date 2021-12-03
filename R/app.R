@@ -29,7 +29,7 @@ server <- function(input, output, session) {
 reactlog::reactlog_enable()
 shinyApp(ui, server)
 
-
+ 
 
 
 
