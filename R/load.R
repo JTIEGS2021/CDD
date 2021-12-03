@@ -1,5 +1,6 @@
-## Functions ************************
-# add the load UI 
+## UI Functions ************************
+## loadUI 
+## - used by load_pass upon accepted password
 loadUI <- function(id) {
   insertUI(
     "#load-status",
@@ -14,21 +15,24 @@ loadUI <- function(id) {
         step = 1
       ),
       textInput(NS(id, "subID"), "Submission ID (as date if not replaced)",value = str_replace_all(sub_date,"-","")),
+      textOutput(NS(id, "subdate")),
       tableOutput(NS(id, "head")),
       verbatimTextOutput(NS(id, "upload_name_check")),
       textOutput(NS(id, "upload_conf")),
+      
+      #actionButton(NS(id,"test"),"test")
     )
   )
 }
 
-# loaded summary report
+## Load loadsumUI components
 loadsumUI <- function(id) {
+  message("loadUI")
   insertUI(
     "#load-upload_conf",
     "afterEnd",
     tagList(
       actionButton(NS(id, "upload_save"), "Submit"),
-      textOutput(NS(id, "subdate")),
       textOutput(NS(id, "subconf")),
       textOutput(NS(id, "subsum"))
 
@@ -37,68 +41,29 @@ loadsumUI <- function(id) {
   )
 }
 
-# remove loadsumUI components
+# Remove loadsumUI components
 loadsumUI_drop <- function(id){
+  message("removeUI")
+  removeUI("#load-upload_save")
   removeUI("#load-subsum")
   removeUI("#load-subconf")
 }
 
-
-
-
-
-## Modules *****************************
+## Server  *****************************
 loadServer <- function(id) {
   moduleServer(id,
                function(input, output, session) {
-                 # reactive variables
-                 loadflag <- reactiveVal(F)
+
                  check_flag <- reactiveVal(NULL)
-                 
-                 ## Reactives **************
-                 ## Initial State
-                 #add date
+                  
+                 ## Direct Outputs
                  output$subdate = renderPrint(print(sub_date))
                  output$upload_conf <- renderText({"Please Load A Dataset"})
-                 
-                 ## takes upload data input and reads the dataset
-                 ## sets upload_df globally
-                
-                 
-                 upload <- reactive({
-                   req(input$upload)
-                   upload_df <-
-                     readxl::read_excel(input$upload$datapath) %>%
-                     select(1:11)%>% 
-                     mutate(id = input$subID, date = Sys.Date())
-                   loadflag(T)
-                   loadsumUI_drop(id)
-                   upload_df
-                 })
-                 
-
                  output$head <- renderTable({
                    head(upload(), input$upload_n)
                  })
                  
-                 ## check variable names
-                 observeEvent(upload(), {
-                   removeUI("#load-upload_save")
-                   if (loadflag() == T) {
-                     names <- upload() %>% names()
-                     checked <- (names == ncheck)
-                     if (all(checked)) {
-                       check_flag(T)
-                       loadsumUI(id)
-                     } else {
-                       check_flag(F)
-                     }
-                     output$upload_name_check <- renderPrint({tibble(names,checked)})
-                   }
-                 })
-                 
-
-                
+                 ## - output reactive to check_flag state
                  output$upload_conf <- renderText({
                    if (is.null(check_flag())) {
                      "Please Load A Dataset"
@@ -108,19 +73,68 @@ loadServer <- function(id) {
                      "Variables Do Not Match"
                    }
                  })
-
                  
-                 ## Reacts to selecting submit, adds upload to df, then removes submit 
+                 
+                 ## Reactively collects xlsx selected
+                 ## - add try-catch
+                 upload <- reactive({
+                   req(input$upload)
+                   upload_df <-
+                     readxl::read_excel(input$upload$datapath) %>%
+                     select(1:11)
+                   upload_df
+                 })
+                 
+                 ## Drops sumUI components when new xlsx is selected
+                 ## - specifically used for multiple selection of xlsx
+                 observeEvent(upload(), {
+                   loadsumUI_drop(id)
+                 })
+                 
+                
+                 ## - Check variable names
+                 ## - Outputs confirmation of variable name check
+                 observeEvent(upload(), {
+                   check_flag(NULL)
+                   names <- upload() %>% names()
+                   checked <- (names == ncheck)
+                   if (all(checked)) {
+                     check_flag(T)
+                   } else {
+                     check_flag(F)
+                   }
+                   output$upload_name_check <-
+                     renderPrint({
+                       tibble(names, checked)
+                     })
+                 })
+                 
+                 ## Load sumUI components
+                 ## - requires check_flag() to be True
+                 observeEvent(check_flag(), {
+                   message("checkflag true")
+                   if(check_flag() == T){
+                     loadsumUI(id)
+                   }
+                 })
+                 
+                 ## - Reacts to selecting submit button 
+                 ## - Concats, upload() to df, 
+                 ## - Adds ID and date to upload()  
+                 ## - Removes submit button to prevent double submission
                  observeEvent(input$upload_save, {
                    message("worrking")
-                   df_base <<- rbind(df_base, upload())
-                   saveRDS(df_base, file = "df_base.rds")
-                   removeUI("#load-upload_save")
+                    df_base <<- rbind(df_base, upload()%>% 
+                                        mutate(id = input$subID, date = Sys.Date()))
+                    saveRDS(df_base, file = "df_base.rds")
                    output$subconf <-renderText("Data saved to main DF")
                    output$subsum <- renderText(nrow(df_base))
+                   removeUI("#load-upload_save")
                    check_flag(NULL)
                  })
                })
+  
+  
 }
 
 

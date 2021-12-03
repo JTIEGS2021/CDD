@@ -30,7 +30,7 @@ ncheck <- c(
   "zip3:20 (not accurately distributed)",
   "date_dx_proc_med:91" ,
   "referal:3" ,
-  "PRO_1:4",
-  "id",
-  "date"
+  "PRO_1:4"#,
+  #"id",
+  #"date"
 )
