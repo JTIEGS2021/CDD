@@ -4,7 +4,7 @@ read_df_base <- function() {
 }
 df_base <- read_df_base()
 
-df <- tibble(                     `pid` = "" ,
+df_empty <- tibble(                     `pid` = "" ,
                                   `ui:2` = "" ,
                                   `proc:2` = "",
                                   `med:2` = "",
@@ -40,7 +40,7 @@ ncheck <- c(
   #"date"
 )
 
-add <- c(
+global_add <- c(
   "ui:2" ,
   "proc:2",
   "med:2",

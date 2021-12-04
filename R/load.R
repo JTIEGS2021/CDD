@@ -123,7 +123,7 @@ loadServer <- function(id) {
                  ## - Adds ID and date to upload()  
                  ## - Removes submit button to prevent double submission
                  observeEvent(input$upload_save, {
-                   message("worrking")
+                   message("uploading")
                     df_base <<- rbind(df_base, upload()%>% 
                                         mutate(id = input$subID, date = Sys.Date()))
                     saveRDS(df_base, file = "df_base.rds")

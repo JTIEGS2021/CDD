@@ -5,7 +5,7 @@ library(shiny)
 library(shinyauthr)
 library(gtsummary)
 library(gt)
-
+library(glue)
 
 files <- c("welcome.R","load.R","utils.R", "dataset.R", "reports.R","global.R",
            "load_pass.R")
