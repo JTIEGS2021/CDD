@@ -1,9 +1,8 @@
 library(shiny)
-library(ggplot2)
 library(tidyverse)
-library(shiny)
 library(shinyauthr)
-
+library(gtsummary)
+library(gt)
 
 files <- c("welcome.R","load.R","utils.R", "dataset.R", "reports.R","global.R",
            "load_pass.R")
@@ -24,6 +23,8 @@ server <- function(input, output, session) {
   
   passServer("load")
   loadServer("load")
+  datasetServer("dataset")
+  reportServer("report")
 }
 
 reactlog::reactlog_enable()

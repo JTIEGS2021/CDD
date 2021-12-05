@@ -1,5 +1,5 @@
 ## UI Functions ************************
-## loadUI 
+## loadUI
 ## - used by load_pass upon accepted password
 loadUI <- function(id) {
   insertUI(
@@ -14,7 +14,11 @@ loadUI <- function(id) {
         min = 1,
         step = 1
       ),
-      textInput(NS(id, "subID"), "Submission ID (as date if not replaced)",value = str_replace_all(sub_date,"-","")),
+      textInput(
+        NS(id, "subID"),
+        "Submission ID (as date if not replaced)",
+        value = str_replace_all(Sys.Date(), "-", "")
+      ),
       textOutput(NS(id, "subdate")),
       tableOutput(NS(id, "head")),
       verbatimTextOutput(NS(id, "upload_name_check")),
@@ -35,14 +39,14 @@ loadsumUI <- function(id) {
       actionButton(NS(id, "upload_save"), "Submit"),
       textOutput(NS(id, "subconf")),
       textOutput(NS(id, "subsum"))
-
+      
       #gt::gt_output(NS(id, "subsum"))
     )
   )
 }
 
 # Remove loadsumUI components
-loadsumUI_drop <- function(id){
+loadsumUI_drop <- function(id) {
   message("removeUI")
   removeUI("#load-upload_save")
   removeUI("#load-subsum")
@@ -53,12 +57,14 @@ loadsumUI_drop <- function(id){
 loadServer <- function(id) {
   moduleServer(id,
                function(input, output, session) {
-
                  check_flag <- reactiveVal(NULL)
-                  
+                 
                  ## Direct Outputs
-                 output$subdate = renderPrint(print(sub_date))
-                 output$upload_conf <- renderText({"Please Load A Dataset"})
+                 output$subdate = renderPrint(print(Sys.Date()))
+                 output$upload_conf <-
+                   renderText({
+                     "Please Load A Dataset"
+                   })
                  output$head <- renderTable({
                    head(upload(), input$upload_n)
                  })
@@ -91,7 +97,7 @@ loadServer <- function(id) {
                    loadsumUI_drop(id)
                  })
                  
-                
+                 
                  ## - Check variable names
                  ## - Outputs confirmation of variable name check
                  observeEvent(upload(), {
@@ -113,21 +119,23 @@ loadServer <- function(id) {
                  ## - requires check_flag() to be True
                  observeEvent(check_flag(), {
                    message("checkflag true")
-                   if(check_flag() == T){
+                   if (check_flag() == T) {
                      loadsumUI(id)
                    }
                  })
                  
-                 ## - Reacts to selecting submit button 
-                 ## - Concats, upload() to df, 
-                 ## - Adds ID and date to upload()  
+                 ## - Reacts to selecting submit button
+                 ## - Concats, upload() to df,
+                 ## - Adds ID and date to upload()
                  ## - Removes submit button to prevent double submission
                  observeEvent(input$upload_save, {
-                   message("worrking")
-                    df_base <<- rbind(df_base, upload()%>% 
-                                        mutate(id = input$subID, date = Sys.Date()))
-                    saveRDS(df_base, file = "df_base.rds")
-                   output$subconf <-renderText("Data saved to main DF")
+                   message("uploading")
+                   df_base <<- rbind(df_base,
+                                     upload() %>%
+                                       mutate(id = input$subID, date = Sys.Date()))
+                   saveRDS(df_base, file = "df_base.rds")
+                   output$subconf <-
+                     renderText("Data saved to main DF")
                    output$subsum <- renderText(nrow(df_base))
                    removeUI("#load-upload_save")
                    check_flag(NULL)
@@ -136,8 +144,3 @@ loadServer <- function(id) {
   
   
 }
-
-
-
-
-

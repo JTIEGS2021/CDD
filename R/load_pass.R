@@ -1,25 +1,4 @@
 ##### Functions
-# add the load UI 
-# loadUI <- function(id) {
-#   insertUI(
-#     "#load-status",
-#     "afterEnd",
-#     tagList(
-#       fileInput(NS(id, "upload"), NULL, accept = c(".xlsx")),
-#       numericInput(
-#         NS(id, "upload_n"),
-#         "Check Rows",
-#         value = 5,
-#         min = 1,
-#         step = 1
-#       ),
-#       tableOutput(NS(id, "head")),
-#       verbatimTextOutput(NS(id, "upload_name_check")),
-#       textOutput(NS(id, "upload_conf"))
-#     )
-#   )
-# }
-
 # remove the pass ui
 removePassUI <- function() {
   removeUI("#load-pass_submit")
@@ -28,10 +7,8 @@ removePassUI <- function() {
 }
 
 
-
-
-#### Modules
-# initial state passUI elements, removed in the serfer
+## Modules
+# initial state passUI elements, removed in the server
 passUI <- function(id) {
   tabPanel(
     "Load",
@@ -42,7 +19,7 @@ passUI <- function(id) {
   )
 }
 
-# 
+## Server
 passServer <- function(id) {
   moduleServer(id,
                function(input, output, session) {
