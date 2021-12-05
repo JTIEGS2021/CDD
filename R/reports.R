@@ -12,12 +12,18 @@ reportsUI <- function(id) {
                ),
                
                h3("Select Id or Dates"),
-               selectInput(NS(id,"id"),"Select ID (default All)", 
-                           choices = select_var(df_base, "id"),
-                           multiple = TRUE),
-               selectInput(NS(id,"date"),"Select Date (default All)", 
-                           choices = select_var(df_base, "date"),
-                           multiple = TRUE),
+               selectInput(
+                 NS(id, "id"),
+                 "Select ID (default All)",
+                 choices = select_var(df_base, "id"),
+                 multiple = TRUE
+               ),
+               selectInput(
+                 NS(id, "date"),
+                 "Select Date (default All)",
+                 choices = select_var(df_base, "date"),
+                 multiple = TRUE
+               ),
                
                ###
                verbatimTextOutput(NS(id, "test")),
@@ -26,7 +32,7 @@ reportsUI <- function(id) {
                actionButton(NS(id, "submit"), "Submit"),
                actionButton(NS(id, "refresh"), "Refesh Data"),
                #downloadButton(NS(id,"download"), "Save Report")
-               )
+             )
              ,
              mainPanel(uiOutput(NS(id, "sumbox")))
            ))
@@ -72,82 +78,83 @@ reportServer <- function(id) {
                  ## 3. generate summaryUI output
                  ## -- updates the add variable as global_add if "All" is selected
                  observeEvent(input$submit,
-                              summaryTbl()
-                              )
-                              
-                              ## Reloads df_base from disc
-                              observeEvent(input$refresh, {
-                                df_base_r(read_df_base())
-                                updateSelectInput(session, "id", "Select ID",
-                                                  choices = select_var(df_base, "id"))
-                                updateSelectInput(session, "date", "Select Date",
-                                                  choices = select_var(df_base, "date"))
-                              })
-                              
-                              ## Download Report
-                              ## - uses summaryTbl_output to generate report
-                              output$download <- downloadHandler(
-                                filename = function() {
-                                  paste("summary",Sys.Date(),".pdf")
-                                  },
-                                content = function(file){summaryTbl_output(file)}
-                              )
-                              
-                              
-                              
-                              ## Functions **************************8
-                              
-                              ## SymmaryTbl
-                              ## - generate the summary table
-                              ## - If add_r NUlL remove the summaryUI 
-                              ##   - render summaryUIalt (as else block bottom)
-                              ## - Else 
-                              ##   - If 'All" selected set add as global add
-                              ##     - render summaryTbl
-                              ##   - Else use selected variables
-                              ##     - render summaryTbl
-                              summaryTbl <- function() {
-                                if (is.null(add_r())) {
-                                  removeUI("#report-summary")
-                                } else {
-                                  df_filter <- filter_df(df_base, input$id, input$date)
-                                  if (nrow(df_filter) !=  0) {
-                                    add <- add_r()
-                                    summaryUI(id, output)
-                                    if ("All" %in% add) {
-                                      add <- global_add
-                                      output$summary <-
-                                        render_gt(tbl_sum(df_filter, add, categorical))
-                                    } else{
-                                      output$summary <-
-                                        render_gt(tbl_sum(df_filter, add, categorical))
-                                    }
-                                  } else {
-                                    summaryUIalt(id, output)
-                                  }
-                                }
-                              }
-                              
-                              ## Summary Tbl output
-                              ## For generating download
-                              ## - set df_filter based on inputs
-                              ## - If "All" export with global_all
-                              ## - Else export with add_r
-                              ## export via gt_save and tbl_sum
-                              summaryTbl_output <- function(file) {
-                                message("HERE")
-                                df_filter <-
-                                  filter_df(df_base, input$id, input$date)
-                                add <- add_r()
-                                if ("All" %in% add) {
-                                  add <- global_add
-                                    gtsave(tbl_sum(df_filter, add, categorical),
-                                           file)
-                                } else {
-                                    gtsave(tbl_sum(df_filter, add, categorical),
-                                           file)
-                                }
-                                message("HERE2")
-                              }
+                              summaryTbl())
+                 
+                 ## Reloads df_base from disc
+                 observeEvent(input$refresh, {
+                   df_base_r(read_df_base())
+                   updateSelectInput(session, "id", "Select ID",
+                                     choices = select_var(df_base, "id"))
+                   updateSelectInput(session, "date", "Select Date",
+                                     choices = select_var(df_base, "date"))
+                 })
+                 
+                 ## Download Report
+                 ## - uses summaryTbl_output to generate report
+                 output$download <- downloadHandler(
+                   filename = function() {
+                     paste("summary", Sys.Date(), ".pdf")
+                   },
+                   content = function(file) {
+                     summaryTbl_output(file)
+                   }
+                 )
+                 
+                 
+                 
+                 ## Functions **************************8
+                 
+                 ## SymmaryTbl
+                 ## - generate the summary table
+                 ## - If add_r NUlL remove the summaryUI
+                 ##   - render summaryUIalt (as else block bottom)
+                 ## - Else
+                 ##   - If 'All" selected set add as global add
+                 ##     - render summaryTbl
+                 ##   - Else use selected variables
+                 ##     - render summaryTbl
+                 summaryTbl <- function() {
+                   if (is.null(add_r())) {
+                     removeUI("#report-summary")
+                   } else {
+                     df_filter <- filter_df(df_base, input$id, input$date)
+                     if (nrow(df_filter) !=  0) {
+                       add <- add_r()
+                       summaryUI(id, output)
+                       if ("All" %in% add) {
+                         add <- global_add
+                         output$summary <-
+                           render_gt(tbl_sum(df_filter, add, categorical))
+                       } else{
+                         output$summary <-
+                           render_gt(tbl_sum(df_filter, add, categorical))
+                       }
+                     } else {
+                       summaryUIalt(id, output)
+                     }
+                   }
+                 }
+                 
+                 ## Summary Tbl output
+                 ## For generating download
+                 ## - set df_filter based on inputs
+                 ## - If "All" export with global_all
+                 ## - Else export with add_r
+                 ## export via gt_save and tbl_sum
+                 summaryTbl_output <- function(file) {
+                   message("HERE")
+                   df_filter <-
+                     filter_df(df_base, input$id, input$date)
+                   add <- add_r()
+                   if ("All" %in% add) {
+                     add <- global_add
+                     gtsave(tbl_sum(df_filter, add, categorical),
+                            file)
+                   } else {
+                     gtsave(tbl_sum(df_filter, add, categorical),
+                            file)
+                   }
+                   message("HERE2")
+                 }
                })
 }

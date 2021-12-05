@@ -25,18 +25,17 @@ select_var <- function(df, var) {
 ## 1. decision based on status of ids and dates (if not null)
 ## 2. filter data based on input from ids and dates
 ## 3. output filtered dataset
-filter_df <- function(dfnt, ids=NULL, dates=NULL) {
-  if(is.null(ids) & !is.null(dates)) {
+
+filter_df <- function(dfnt, ids = NULL, dates = NULL) {
+  if (is.null(ids) & !is.null(dates)) {
     df <- dfnt %>% filter(date %in% as.Date(dates))
   } else if (!is.null(ids) & is.null(dates)) {
     df <- dfnt %>% filter(id %in% ids)
   } else if (!is.null(ids) & !is.null(dates)) {
-    df <- dfnt %>% filter(id %in% ids, date %in%as.Date(dates))
+    df <- dfnt %>% filter(id %in% ids, date %in% as.Date(dates))
   } else {
     df <- dfnt
   }
   return(df)
 }
 #filter_dat(df_base, "20211202asf", c("2021-12-03"))
-
-
