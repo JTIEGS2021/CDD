@@ -8,7 +8,7 @@ removePassUI <- function() {
 
 
 ## Modules
-# initial state passUI elements, removed in the serfer
+# initial state passUI elements, removed in the server
 passUI <- function(id) {
   tabPanel(
     "Load",

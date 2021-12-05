@@ -14,7 +14,7 @@ loadUI <- function(id) {
         min = 1,
         step = 1
       ),
-      textInput(NS(id, "subID"), "Submission ID (as date if not replaced)",value = str_replace_all(sub_date,"-","")),
+      textInput(NS(id, "subID"), "Submission ID (as date if not replaced)",value = str_replace_all(Sys.Date(),"-","")),
       textOutput(NS(id, "subdate")),
       tableOutput(NS(id, "head")),
       verbatimTextOutput(NS(id, "upload_name_check")),
@@ -57,7 +57,7 @@ loadServer <- function(id) {
                  check_flag <- reactiveVal(NULL)
                   
                  ## Direct Outputs
-                 output$subdate = renderPrint(print(sub_date))
+                 output$subdate = renderPrint(print(Sys.Date()))
                  output$upload_conf <- renderText({"Please Load A Dataset"})
                  output$head <- renderTable({
                    head(upload(), input$upload_n)
